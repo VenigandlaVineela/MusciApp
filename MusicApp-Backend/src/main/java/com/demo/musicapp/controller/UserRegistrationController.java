@@ -15,7 +15,7 @@ import com.demo.musicapp.service.UserRegistrationservice;
 
 @RestController
 @RequestMapping("/musicApp/registration")
-@CrossOrigin(origins = "http://localhost:5173") // Allow only your frontend
+@CrossOrigin(origins = "*")  
 
 public class UserRegistrationController {
 	

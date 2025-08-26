@@ -1,6 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import logo from './assets/logo.png';
+import { Link } from 'react-router-dom';
 
 const DashboardFooter = () => {
+
+     const navigate = useNavigate();
+
      return (
           <footer className="footer text-white pt-5 pb-3">
                <div className="container">
@@ -18,10 +23,10 @@ const DashboardFooter = () => {
                          <div className="col-md-4 col-sm-12 mb-4">
                               <h5 className="footer-title mb-3">Services</h5>
                               <ul className="list-unstyled footer-links">
-                                   <li><a href="#">Home</a></li>
-                                   <li><a href="#">Categories</a></li>
-                                   <li><a href="#">About</a></li>
-                                   <li><a href="#">Trending</a></li>
+                                   <li><Link to='/dashboard'>Home</Link></li>
+                                   <li><Link to='/dashboard/musictypes'>Music Types</Link></li>
+                                   {/* <li><a onClick={()=>{navigate('/')}}>Random Play</a></li> */}
+                                   {/* <li><a onClick={()=>{navigate('/')}}>Contact</a></li> */}
                               </ul>
                          </div>
 
@@ -34,11 +39,11 @@ const DashboardFooter = () => {
                          </div>
 
                     </div>
-                    </div>
+               </div>
 
-                    <hr className="border-light container-fluid" />
-                    <p className="text-center mb-0 small">&copy; 2025 Music App. All rights reserved.</p>
-                
+               <hr className="border-light container-fluid" />
+               <p className="text-center mb-0 small">&copy; 2025 Music App. All rights reserved.</p>
+
           </footer>
      );
 };

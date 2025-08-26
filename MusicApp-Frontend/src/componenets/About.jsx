@@ -1,8 +1,11 @@
 import image2 from '../assets/image2.png';
 import 'animate.css';
+import { useNavigate } from 'react-router-dom';
 
 
 const About = () => {
+const navigate = useNavigate();
+  
   return (
     <>
       <div style={{
@@ -36,6 +39,8 @@ const About = () => {
                 style={{
                   backgroundImage: 'linear-gradient(135deg, #92316e, #3B82F6, #6e2daa)',
                 }}
+                              onClick={()=>navigate('/musictypes')}
+
               >
                 Read More
               </button>

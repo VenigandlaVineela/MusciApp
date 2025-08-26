@@ -1,322 +1,275 @@
-import React, { useState, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import Footer from '../Footer';
-import { motion } from 'framer-motion';
-import playIcon from '../assets/playIcon.png';
-import pauseIcon from '../assets/pauseIcon.png';
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import DashboardNavbar from "./DashboardNavbar";
+import DashboardFooter from "../DashboardFooter";
 
-// Music files
-import western from '../assets/Western.mp3';
-import music2 from '../assets/music2.mp3';
-import music3 from '../assets/music3.mp3';
-import music4 from '../assets/music4.mp3';
-import music5 from '../assets/music5.mp3';
-import music6 from '../assets/music6.mp3';
-import music7 from '../assets/music7.mp3';
-import music8 from '../assets/music8.mp3';
-import music9 from '../assets/music9.mp3';
-import music10 from '../assets/music10.mp3';
-
-// Images
-import musicimage from '../assets/musicimage.png';
-import c1 from '../assets/c1.png';
-import c2 from '../assets/c2.png';
-import c3 from '../assets/c3.png';
-import c4 from '../assets/c4.png';
-import { div } from 'framer-motion/client';
-import DashboardNavbar from './DashboardNavbar';
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
-};
 
 const DashboardMusicPlayList = () => {
-  const location = useLocation();
-  const selectedGenre = location.state?.genre || 'Pop';
+  const { type } = useParams();
+  const [songs, setSongs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  //  Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const songsPerPage = 3;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentSong, setCurrentSong] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  //  Modal
+  const [selectedSong, setSelectedSong] = useState(null);
+
+  //  Audio Ref
   const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const [allMusic] = useState([
-    // Pop
-    { music: western, image: musicimage, title: "Pop Hit 1", genre: "Pop" },
-    { music: music2, image: c1, title: "Pop Hit 2", genre: "Pop" },
-    { music: music3, image: c2, title: "Pop Hit 3", genre: "Pop" },
-    { music: music4, image: c3, title: "Pop Hit 4", genre: "Pop" },
-    { music: music5, image: c4, title: "Pop Hit 5", genre: "Pop" },
-    { music: music6, image: c1, title: "Pop Hit 6", genre: "Pop" },
-    { music: music10, image: musicimage, title: "Pop Hit 7", genre: "Pop" },
-    { music: music7, image: c1, title: "Pop Hit 8", genre: "Pop" },
-    { music: music8, image: c2, title: "Pop Hit 9", genre: "Pop" },
-    { music: music9, image: c3, title: "Pop Hit 10", genre: "Pop" },
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/musicApp/music/type/${type}`
+        );
+        const data = await response.json();
+        setSongs(data);
+      } catch (err) {
+        console.error("Error fetching songs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Rock
-    { music: music10, image: c2, title: "Rock Vibes", genre: "Rock" },
-    { music: music9, image: c3, title: "Rock Legend", genre: "Rock" },
-    { music: music8, image: c2, title: "Rock Fire", genre: "Rock" },
-    { music: music7, image: c3, title: "Rock Live", genre: "Rock" },
-    { music: music6, image: c2, title: "Rock Anthem", genre: "Rock" },
-    { music: music5, image: c3, title: "Rock Classic", genre: "Rock" },
-    { music: music4, image: c2, title: "Rock Vibes", genre: "Rock" },
-    { music: music3, image: c3, title: "Rock Legend", genre: "Rock" },
-    { music: music2, image: c2, title: "Rock Fire", genre: "Rock" },
-    { music: western, image: c3, title: "Rock Live", genre: "Rock" },
+    fetchSongs();
+  }, [type]);
 
-    // Jazz
-    { music: music5, image: c4, title: "Jazz Standard", genre: "Jazz" },
-    { music: music6, image: musicimage, title: "Jazz Improv", genre: "Jazz" },
-    { music: music5, image: c1, title: "Jazz Soul", genre: "Jazz" },
-    { music: music6, image: c2, title: "Jazz Cool", genre: "Jazz" },
-    { music: music5, image: c3, title: "Jazz Fusion", genre: "Jazz" },
-    { music: music6, image: c4, title: "Jazz Light", genre: "Jazz" },
-    { music: music5, image: c4, title: "Jazz Standard", genre: "Jazz" },
-    { music: music6, image: musicimage, title: "Jazz Improv", genre: "Jazz" },
-    { music: music5, image: c1, title: "Jazz Soul", genre: "Jazz" },
-    { music: music6, image: c2, title: "Jazz Cool", genre: "Jazz" },
+  //  Pagination logic
+  const indexOfLastSong = currentPage * songsPerPage;
+  const indexOfFirstSong = indexOfLastSong - songsPerPage;
+  const currentSongs = songs.slice(indexOfFirstSong, indexOfLastSong);
+  const totalPages = Math.ceil(songs.length / songsPerPage);
 
-    // Hip-Hop
-    { music: music10, image: c3, title: "Hip-Hop Beat", genre: "Hip-Hop" },
-    { music: music5, image: c1, title: "Hip-Hop Groove", genre: "Hip-Hop" },
-    { music: music3, image: c2, title: "Hip-Hop Flow", genre: "Hip-Hop" },
-    { music: music7, image: c4, title: "Hip-Hop Vibe", genre: "Hip-Hop" },
-    { music: music9, image: c2, title: "Hip-Hop Mix", genre: "Hip-Hop" },
-    { music: western, image: c3, title: "Hip-Hop Beat", genre: "Hip-Hop" },
-    { music: music2, image: c1, title: "Hip-Hop Groove", genre: "Hip-Hop" },
-    { music: music4, image: c2, title: "Hip-Hop Flow", genre: "Hip-Hop" },
-    { music: music6, image: c4, title: "Hip-Hop Vibe", genre: "Hip-Hop" },
-    { music: music8, image: c1, title: "Hip-Hop Drop", genre: "Hip-Hop" },
-
-    // Electronic
-    { music: music3, image: c1, title: "Electronic Dance", genre: "Electronic" },
-    { music: music10, image: c2, title: "Electronic Bass", genre: "Electronic" },
-    { music: music8, image: c3, title: "Electronic Wave", genre: "Electronic" },
-    { music: music6, image: c4, title: "Electronic Chill", genre: "Electronic" },
-    { music: music4, image: c1, title: "Electronic Pop", genre: "Electronic" },
-    { music: music2, image: c2, title: "Electronic Pulse", genre: "Electronic" },
-    { music: western, image: c1, title: "Electronic Dance", genre: "Electronic" },
-    { music: music5, image: c2, title: "Electronic Bass", genre: "Electronic" },
-    { music: music7, image: c3, title: "Electronic Wave", genre: "Electronic" },
-    { music: music9, image: c4, title: "Electronic Chill", genre: "Electronic" },
-
-
-    // Folk
-    { music: music2, image: c2, title: "Folk Song", genre: "Folk" },
-    { music: music4, image: c3, title: "Folk Harmony", genre: "Folk" },
-    { music: music6, image: c4, title: "Folk Strings", genre: "Folk" },
-    { music: music8, image: c1, title: "Folk Tune", genre: "Folk" },
-    { music: music10, image: c2, title: "Folk Melody", genre: "Folk" },
-    { music: music3, image: c3, title: "Folk Rhythm", genre: "Folk" },
-    { music: music5, image: c2, title: "Folk Song", genre: "Folk" },
-    { music: music7, image: c3, title: "Folk Harmony", genre: "Folk" },
-    { music: music9, image: c4, title: "Folk Strings", genre: "Folk" },
-    { music: western, image: c1, title: "Folk Tune", genre: "Folk" },
-
-
-    // Classical
-    { music: western, image: c4, title: "Classical Piece", genre: "Classical" },
-    { music: music10, image: c1, title: "Classical Symphony", genre: "Classical" },
-    { music: music8, image: c2, title: "Classical Harmony", genre: "Classical" },
-    { music: music6, image: c3, title: "Classical Strings", genre: "Classical" },
-    { music: music4, image: c4, title: "Classical Flow", genre: "Classical" },
-    { music: music2, image: c1, title: "Classical Rhythm", genre: "Classical" },
-    { music: music9, image: c4, title: "Classical Piece", genre: "Classical" },
-    { music: music7, image: c1, title: "Classical Symphony", genre: "Classical" },
-    { music: music5, image: c2, title: "Classical Harmony", genre: "Classical" },
-    { music: music3, image: c3, title: "Classical Strings", genre: "Classical" },
-
-    // K-Pop
-    { music: music5, image: c1, title: "K-Pop Hit", genre: "K-Pop" },
-    { music: music6, image: c2, title: "K-Pop Vibe", genre: "K-Pop" },
-    { music: music7, image: c3, title: "K-Pop Groove", genre: "K-Pop" },
-    { music: music8, image: c4, title: "K-Pop Idol", genre: "K-Pop" },
-    { music: music9, image: c1, title: "K-Pop Dance", genre: "K-Pop" },
-    { music: music10, image: c2, title: "K-Pop Love", genre: "K-Pop" },
-    { music: music2, image: c1, title: "K-Pop Hit", genre: "K-Pop" },
-    { music: music3, image: c2, title: "K-Pop Vibe", genre: "K-Pop" },
-    { music: music4, image: c3, title: "K-Pop Groove", genre: "K-Pop" },
-    { music: music5, image: c4, title: "K-Pop Idol", genre: "K-Pop" },
-  ]);
-
-  const filteredMusic = allMusic.filter((item) => item.genre === selectedGenre);
-  const totalPages = Math.ceil(filteredMusic.length / itemsPerPage);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredMusic.slice(indexOfFirstItem, indexOfLastItem);
-
-  const handlePageChange = (pageNumber) => {
+  const goToPage = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
   };
 
-  const openModal = (song) => {
-    setCurrentSong(song);
-    setIsModalOpen(true);
-    setIsPlaying(false);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setIsPlaying(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-  };
-
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
+  //  Play / Pause sync
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
 
   return (
     <>
-     
-      <DashboardNavbar/>
-
-      <motion.section
-        className="py-5"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-         
+      <DashboardNavbar />
+      <div style={{
+        background:
+          "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+        color: "white",
+      }}>
+        <section className="py-5">
           <div className="container">
-            <h1 className="text-center mb-4 text-white" style={{backgroundImage: 'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                 }} >{selectedGenre} Playlist</h1>
+            <h2
+              className="text-center mb-5"
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: "bold",
+              }}
+            >
+              {type} Playlist
+            </h2>
 
-            <div className="row g-4  ">
-              {currentItems.map((song, index) => (
-                <motion.div
-                  className="col-md-4 col-sm-6"
-                  key={index}
-                  variants={cardVariants}
-                  initial="hidden"
-                  animate="visible"
-                  whileHover={{
-                    scale: 1.03,
-                    transition: { type: 'spring', stiffness: 300 },
-                  }}
-                >
-                  <div
-                    className="card h-100 shadow rounded-4 border-0 p-3 d-flex flex-column align-items-center"
-                    style={{ background: "#fff", cursor: "pointer" }}
-                    onClick={() => openModal(song)}
-                  >
-                    <img
-                      src={song.image}
-                      alt={song.title}
-                      className="img-fluid rounded-3 mb-3 "
-                      style={{ height: '200px', objectFit: 'cover', width: '100%'  }}
-                    />
-                    <h5 className="text-center fw-bold"  style={{
-                backgroundImage: 'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                display: 'inline-block',
-              }}>{song.title}</h5>
-                  </div>
-                </motion.div>
-              ))}
-
-              {filteredMusic.length === 0 && (
-                <div className="text-center">
-                  <p>No songs available in this genre.</p>
+            {loading ? (
+              <p className="text-center">Loading...</p>
+            ) : currentSongs.length === 0 ? (
+              <p className="text-center">No songs available for {type}</p>
+            ) : (
+              <>
+                <div className="row g-4">
+                  {currentSongs.map((song) => (
+                    <div className="col-md-4" key={song.id}>
+                      <div
+                        className="card h-100 text-center shadow-sm border border-2"
+                        style={{ borderRadius: "15px" }}
+                      >
+                        <div className="card-body d-flex flex-column align-items-center">
+                          {/* ✅ Square image - opens modal */}
+                          <img
+                            src={`http://localhost:8080/musicApp/music/${song.id}/image`}
+                            alt={song.title}
+                            className="img-fluid mb-3 rounded rounded-3"
+                            style={{
+                              height: "300px",
+                              width: "300px",
+                              objectFit: "cover",
+                              cursor: "pointer",
+                            }}
+                            data-bs-toggle="modal"
+                            data-bs-target="#songModal"
+                            onClick={() => setSelectedSong(song)}
+                          />
+                          <h4
+                            className="fw-semibold"
+                            style={{
+                              backgroundImage:
+                                "linear-gradient(135deg, #e62cdaff, #ad98eaff)",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {song.singer}
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
 
-            {totalPages > 1 && (
-              <motion.nav
-                aria-label="Page navigation"
-                className="mt-5"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <ul className="pagination justify-content-center">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button className="page-link text-white" onClick={() => handlePageChange(currentPage - 1)} style={{
-                backgroundImage: 'linear-gradient(135deg, #92316e, #3B82F6, #6e2daa)',
-              }}>
-                      Previous
-                    </button>
-                  </li>
-
-                  {Array.from({ length: totalPages }, (_, index) => (
+                {/* ✅ Pagination */}
+                <nav aria-label="Page navigation" className="mt-4">
+                  <ul className="pagination justify-content-center">
                     <li
-                      key={index}
-                      className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
+                      className={`page-item ${currentPage === 1 ? "disabled" : ""
+                        }`}
                     >
-                      <button className="page-link" onClick={() => handlePageChange(index + 1)}>
-                        {index + 1}
+                      <button
+                        className="page-link"
+                        onClick={() => goToPage(currentPage - 1)}
+                      >
+                        Previous
                       </button>
                     </li>
-                  ))}
 
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button className="page-link text-white" onClick={() => handlePageChange(currentPage + 1)} style={{
-                backgroundImage: 'linear-gradient(135deg, #92316e, #3B82F6, #6e2daa)',
-              }}>
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </motion.nav>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <li
+                        key={i + 1}
+                        className={`page-item ${currentPage === i + 1 ? "active" : ""
+                          }`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => goToPage(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+
+                    <li
+                      className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                        }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => goToPage(currentPage + 1)}
+                      >
+                        Next
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </>
             )}
           </div>
-           
-      </motion.section>
+        </section>
+      </div>
 
-      {/* Modal */}
-      {isModalOpen && currentSong && (
-        <div
-          className="modal fade show"
-          style={{ display: "block", background: "rgba(0,0,0,0.7)" }}
-        >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content rounded-4 p-4 text-center">
-              <button
-                className="btn-close ms-auto"
-                onClick={closeModal}
-              ></button>
-              <img
-                src={currentSong.image}
-                alt={currentSong.title}
-                className="img-fluid rounded-3 mb-3"
-                style={{ height: '250px', objectFit: 'cover', width: '100%' }}
-              />
-              <h5 className="fw-bold mb-3">{currentSong.title}</h5>
-              <div className='text-center'>
-                <img
-                  src={isPlaying ? pauseIcon : playIcon}
-                  alt="Play/Pause"
-                  style={{ height: "50px", width: "50px", cursor: "pointer" }}
-                  onClick={togglePlay} />
-              </div>
-              <audio ref={audioRef} src={currentSong.music} />
-            </div>
+      {/* ✅ Modal */}
+      <div
+        className="modal fade"
+        id="songModal"
+        tabIndex="-1"
+        aria-labelledby="songModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div
+            className="modal-content p-3"
+            style={{
+              borderRadius: "20px",
+              background:
+                "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+              color: "white",
+              boxShadow: "0px 4px 25px rgba(0,0,0,0.4)",
+            }}
+          >
+            {selectedSong && (
+              <>
+                <div className="modal-header border-0">
+                  <h5
+                    className="modal-title fw-bold"
+                    id="songModalLabel"
+                  >
+                    {selectedSong.title}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+
+                <div className="modal-body text-center">
+                  {/*  Animated Circle Album Art */}
+                  <div className="music-image-container">
+                    <img
+                      src={`http://localhost:8080/musicApp/music/${selectedSong.id}/image`}
+                      alt={selectedSong.title}
+                      className={`music-image ${isPlaying ? "playing" : ""
+                        }`}
+                    />
+                  </div>
+
+                  <h5
+                    className="mt-3"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(135deg, #e62cda, #6e2daa, #3B82F6)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {selectedSong.singer}
+                  </h5>
+
+                  {/*  Audio Player */}
+                  <audio
+                    ref={audioRef}
+                    controls
+                    style={{ width: "50%", marginTop: "15px" }}
+                    onPlay={handlePlay}
+                    onPause={handlePause}
+                  >
+                    <source
+                      src={`http://localhost:8080/musicApp/music/${selectedSong.id}/audio`}
+                      type="audio/mpeg"
+                    />
+                    Your browser does not support the audio element.
+                  </audio>
+
+                  {/* 🎵 Equalizer Animation */}
+                  {isPlaying && (
+                    <div className="equalizer mt-4">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
-      <Footer />
-      
+      <DashboardFooter />
     </>
   );
 };
 
 export default DashboardMusicPlayList;
+
+

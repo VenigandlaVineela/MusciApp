@@ -4,7 +4,8 @@ import bg3 from '../assets/bg3.png';
 import bg4 from '../assets/bg4.png';
 import mic from '../assets/mic.png';
 import western from '../assets/western.mp3';
- 
+import slide1 from '../assets/slide1.png';
+
 
 
 const DashboardSlides = () => {
@@ -48,11 +49,12 @@ const DashboardSlides = () => {
             <div
               className="d-flex align-items-center justify-content-center text-white fade-in"
               style={{
-                backgroundImage: `url(${bg1})`,
+                backgroundImage: `url(${slide1})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 minHeight: '100vh',
-animation: 'zoomIn 1s ease'              }}
+                animation: 'zoomIn 1s ease'
+              }}
             >
               <div className="container">
                 <div className="row align-items-center">
@@ -72,7 +74,7 @@ animation: 'zoomIn 1s ease'              }}
                     </button>
                   </div>
                   <div className="col-md-6 text-center">
-                    <img src={mic} alt="Mic" className="img-fluid"  />
+                    <img src={mic} alt="Mic" className="img-fluid" />
                   </div>
                 </div>
               </div>
@@ -80,16 +82,17 @@ animation: 'zoomIn 1s ease'              }}
           </div>
 
           {/* Slide 2 - Classic */}
-          <div className="carousel-item">
+          {/* <div className="carousel-item">
             <div
               className="d-flex align-items-center justify-content-center text-white fade-in"
               style={{
-                backgroundImage: `url(${bg3})`,
+                backgroundImage: `url(${bg1})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 minHeight: '100vh',
                 padding: '20px',
-animation: 'zoomIn 1s ease'              }}
+                animation: 'zoomIn 1s ease'
+              }}
             >
               <div className="container">
                 <div className="row align-items-center">
@@ -114,7 +117,7 @@ animation: 'zoomIn 1s ease'              }}
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Slide 3 - Pop with Zoom */}
           <div className="carousel-item">
@@ -147,7 +150,7 @@ animation: 'zoomIn 1s ease'              }}
                     </button>
                   </div>
                   <div className="col-md-6 text-center">
-                    <img src={mic} alt="Mic" className="img-fluid"  />  
+                    <img src={mic} alt="Mic" className="img-fluid" />
                   </div>
                 </div>
               </div>

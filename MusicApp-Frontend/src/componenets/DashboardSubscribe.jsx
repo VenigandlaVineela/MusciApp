@@ -1,12 +1,10 @@
 import React from 'react';
 import image3 from '../assets/image3.png';
-import Navbar from './Navbar';
-import Footer from '../Footer';
 
 const DashboardSubscribe = () => {
   return (
     <>
-       <div className="card text-white position-relative border-0 mt-5">
+       <div className="card text-white position-relative border-0 ">
         <img
           src={image3}
           className="card-img img-fluid"
@@ -29,7 +27,7 @@ const DashboardSubscribe = () => {
                 <input
                   type="text"
                   className="form-control p-3"
-                  placeholder="First name"
+                  placeholder="Your Name"
                 />
               </div>
               <div className="col-12 col-md-4">
@@ -44,7 +42,7 @@ const DashboardSubscribe = () => {
                   type="submit"
                   className="btn w-100 py-3 text-white border-0 btn-subscribe"
                 >
-                  Sign in
+                  Subscribe
                 </button>
               </div>
             </div>

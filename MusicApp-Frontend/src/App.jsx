@@ -14,25 +14,24 @@ import Privateroute from './componenets/PrivateRoute'
 
 
 function App() {
-  
+
 
   return (
     <>
       <Routes>
         <Route path='/' element={<Home />}></Route>
         <Route path='/musictypes' element={<MusicTypes />}></Route>
-        <Route path='/musicplaylist/:type' element={<MusicPlayList />}></Route>         
-   
+        <Route path='/musicplaylist/:type' element={<MusicPlayList />}>
+        </Route>
 
 
+        <Route element={<Privateroute />}>
+          <Route path='/dashboard' element={<Dashboard />}></Route>
+          <Route path='/dashboard/musictypes' element={<DashboardMusicTypes />}></Route>
+          <Route path='/dashboard/musicplaylist/:type' element={<DashboardMusicPlayList />}></Route>
 
-  <Route element={<Privateroute/>}>
-        <Route path='/dashboard' element={<Dashboard />}></Route>
-        <Route path='/dashboard/musictypes' element={<DashboardMusicTypes />}></Route>
-        <Route path='/dashboard/musicplaylist' element={<DashboardMusicPlayList />}></Route>
-
-  </Route>
-</Routes>
+        </Route>
+      </Routes>
 
 
 

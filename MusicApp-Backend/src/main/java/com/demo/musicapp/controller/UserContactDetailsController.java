@@ -15,7 +15,7 @@ import com.demo.musicapp.service.UserContactDetailsService;
 
 @RestController
 @RequestMapping("/musicApp/ContactDetails")
-@CrossOrigin(origins = "http://localhost:5175")  
+@CrossOrigin(origins = "*")  
 
 public class UserContactDetailsController {
 	

@@ -1,49 +1,95 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
-import { MdAccountCircle, MdOutlineAccountCircle, MdOutlineMailOutline } from "react-icons/md";
-import { RiLockPasswordFill } from "react-icons/ri";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+ import { CgPlayButtonO } from "react-icons/cg";
+import { GiPauseButton } from "react-icons/gi";
+import logo from '../assets/logo.png'
+import { FaCloudDownloadAlt } from "react-icons/fa";
 
-import logo1 from '../assets/logo1.png';
-import western from '../assets/Western.mp3';
-import music2 from '../assets/music2.mp3';
-import music3 from '../assets/music3.mp3';
-import music4 from '../assets/music4.mp3';
-import music5 from '../assets/music5.mp3';
-import music6 from '../assets/music6.mp3';
-import music7 from '../assets/music7.mp3';
-import music8 from '../assets/music8.mp3';
-import music9 from '../assets/music9.mp3';
-import music10 from '../assets/music10.mp3';
-import c1 from '../assets/c1.png';
-import playIcon from '../assets/playIcon.png';
-import pauseIcon from '../assets/pauseIcon.png';
 
 const DashboardNavbar = () => {
   const navigate = useNavigate();
 
-   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const audioRef = useRef(null);
-
-   
+  //contact
+  const [contactData, setContactData] = useState({ name: "", email: "", message: "" });
 
   // Form States
   const [registerData, setRegisterData] = useState({ username: '', email: '', password: '' });
   const [loginData, setLoginData] = useState({ username: '', password: '' });
 
-  const musicList = [
-    { file: western, name: 'Western' },
-    { file: music2, name: 'Music 2' },
-    { file: music3, name: 'Music 3' },
-    { file: music4, name: 'Music 4' },
-    { file: music5, name: 'Music 5' },
-    { file: music6, name: 'Music 6' },
-    { file: music7, name: 'Music 7' },
-    { file: music8, name: 'Music 8' },
-    { file: music9, name: 'Music 9' },
-    { file: music10, name: 'Music 10' },
-  ];
+  // Music Player State
+  const [musicList, setMusicList] = useState([]);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  //  Fetch songs from API
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/musicApp/music/all");
+        const data = await response.json();
+        setMusicList(data);
+      } catch (error) {
+        console.error("Error fetching music:", error);
+      }
+    };
+    fetchSongs();
+  }, []);
+
+  //  Play/Pause handler
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  // Shuffle random song
+  const playRandomTrack = () => {
+    if (musicList.length > 0) {
+      const randomIndex = Math.floor(Math.random() * musicList.length);
+      setCurrentTrackIndex(randomIndex);
+      setIsPlaying(true);
+      setTimeout(() => audioRef.current.play(), 200);
+    }
+  };
+
+  // Handle input change
+  const handleContactChange = (e) => {
+    setContactData({ ...contactData, [e.target.id]: e.target.value });
+  };
+
+  const handleContact = async (e) => {
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8080/musicApp/ContactDetails/createUserContactDetails",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(contactData)
+        }
+      );
+
+      if (response.ok) {
+        alert("Message sent successfully!");
+        setContactData({ name: "", email: "", message: "" });
+
+        // Close modal
+        const modalEl = document.getElementById("contactModal");
+        const modal = window.bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+      } else {
+        alert("Failed to send message. Try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    }
+  };
 
   // Handle Input Change
   const handleRegisterChange = (e) => {
@@ -53,40 +99,35 @@ const DashboardNavbar = () => {
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
- 
-
-  // Music Functions
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const playRandomTrack = () => {
-    const randomIndex = Math.floor(Math.random() * musicList.length);
-    setCurrentTrackIndex(randomIndex);
-    if (isPlaying) {
-      setTimeout(() => {
-        audioRef.current.play();
-      }, 0);
-    }
-  };
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.load();
-    }
-  }, [currentTrackIndex]);
 
 
-
-  const handlelogout=()=>{
+  const handlelogout = () => {
     sessionStorage.removeItem("loggedInUser");
-   navigate('/');
+    navigate('/');
   }
+
+
+  //download 
+  const downloadSong = async (songId, title) => {
+  try {
+    const response = await fetch(`http://localhost:8080/musicApp/music/${songId}/audio`);
+    if (!response.ok) throw new Error("Failed to fetch audio");
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title}.mp3`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
+};
+
 
   return (
     <>
@@ -94,18 +135,17 @@ const DashboardNavbar = () => {
       <section
         className="sticky-top shadow-sm"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          zIndex: 1030,
-        }}
-      >
+          background:
+            "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+          color: "white",
+        }}>
+
         <div className="container">
           <div className="row align-items-center py-2">
             {/* Logo */}
             <div className="col-md-6 col-sm-12 d-flex align-items-center">
               <img
-                src={logo1}
+                src={logo}
                 alt="Logo"
                 className="img-fluid"
                 onClick={() => navigate('/dashboard')}
@@ -132,7 +172,7 @@ const DashboardNavbar = () => {
                           className="btn px-2 py-2 fw-bold  "
                           style={{
                             backgroundImage:
-                              'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
+                              'linear-gradient(135deg, rgba(37, 8, 27, 1), #3B82F6, #6e2daa)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                           }}
@@ -199,8 +239,6 @@ const DashboardNavbar = () => {
                           Logout
                         </button>
                       </li>
-
-                      
                     </ul>
                   </div>
                 </div>
@@ -257,52 +295,137 @@ const DashboardNavbar = () => {
       {/* Random Play Modal */}
       <div className="modal fade" id="randomModal" tabIndex="-1">
         <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header text-center">
-              <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+          <div className="modal-content p-3" style={{
+            borderRadius: "20px",
+            background:
+              "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+
+            boxShadow: "0px 4px 25px rgba(0,0,0,0.4)",
+          }}>
+            <div className="modal-header text-center border-0 ">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
             </div>
-            <div className="modal-body">
-              <div className="container d-flex flex-column justify-content-center align-items-center bg-light p-4">
-                <h1 className="mb-4 text-dark">Random Music Player</h1>
-                <div className="card p-4 shadow" style={{ width: '300px' }}>
-                  <div className="position-relative mb-3">
-                    <img
-                      src={c1}
-                      alt="Album cover"
-                      className="w-100"
-                      style={{ height: '200px', objectFit: 'cover' }}
-                    />
-                    <button
-                      onClick={togglePlayPause}
-                      className="position-absolute top-50 start-50 translate-middle rounded-circle p-0"
-                      style={{ width: '60px', height: '60px' }}
-                    >
+            <div className="modal-body text-center" style={{
+              background:
+                "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+            }}>
+              <div className="container d-flex flex-column justify-content-center align-items-center bg-light p-4" style={{
+                background:
+                  "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+
+              }}>
+                <h1 className="mb-4 text-dark" style={{
+                  backgroundImage: 'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #ea5e86ff)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontWeight: "bold",
+                }}>Random Music Player</h1>
+
+                {musicList.length > 0 ? (
+                  <div className=" p-4 " style={{ width: "300px" }}>
+                    <div className="position-relative mb-3 music-image-container">
+                      {/*  API Image */}
                       <img
-                        src={isPlaying ? pauseIcon : playIcon}
-                        alt={isPlaying ? 'Pause' : 'Play'}
-                        style={{ width: '30px', height: '30px' }}
+                        src={`http://localhost:8080/musicApp/music/${musicList[currentTrackIndex].id}/image`}
+                        alt="Album cover"
+                        className={` music-image ${isPlaying ? "playing" : ""
+                          }`}
+                        style={{ objectFit: "cover" }}
                       />
-                    </button>
+
+                      {/*  Play/Pause Button */}
+                      <button
+                        onClick={togglePlayPause}
+                        className="position-absolute top-50 start-50 translate-middle rounded-circle border-0 shadow d-flex align-items-center justify-content-center"
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          marginTop: "10px",
+                          background: "white",
+                        }}
+                      >
+                        {isPlaying ? (
+                          <GiPauseButton size={40} color="#6c2bd9" />
+                        ) : (
+                          <CgPlayButtonO size={40} color="#6c2bd9" />
+                        )}
+                      </button>
+
+                    </div>
+
+                    {/*  Song Title + Singer */}
+                    <h5 className="text-center my-3 "
+                      style={{
+                        backgroundImage: 'linear-gradient(135deg, #e62cdaff, #ad98eaff)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontWeight: 'bold',
+                      }}>                    
+                      {musicList[currentTrackIndex].singer}
+
+                    </h5>
+
+                    {/*  Audio File */}
+                    <audio
+                      ref={audioRef}
+                      src={`http://localhost:8080/musicApp/music/${musicList[currentTrackIndex].id}/audio`}
+                      onEnded={() => setIsPlaying(false)}
+                    />
+
+                    {/*  Shuffle Button */}
+                    <div className="d-flex justify-content-center gap-3 mt-3">
+  {/* Shuffle Button */}
+  <button
+    onClick={playRandomTrack}
+    className="px-4 py-2 fw-bold btn rounded rounded-3 text-white"
+    style={{
+      backgroundImage:
+        'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      border: '2px solid white',
+    }}
+  >
+    Shuffle
+  </button>
+
+  {/* Download Button */}
+  <button
+    onClick={() =>
+      downloadSong(
+        musicList[currentTrackIndex].id,
+        musicList[currentTrackIndex].singer
+      )
+    }
+    className="btn border d-flex align-items-center justify-content-center rounded-3"
+    style={{
+      
+      color: "white",
+      fontSize: "20px",
+      backgroundImage:
+        'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      border: '2px solid white',
+    }}
+  >
+    <FaCloudDownloadAlt />
+  </button>
+</div>
+   
                   </div>
-                  <h5 className="text-center my-3 text-secondary">
-                    {musicList[currentTrackIndex].name}
-                  </h5>
-                  <audio
-                    ref={audioRef}
-                    src={musicList[currentTrackIndex].file}
-                    onEnded={() => setIsPlaying(false)}
-                  />
-                  <button onClick={playRandomTrack} className="w-100 py-2 fw-bold btn btn-success">
-                    Shuffle
-                  </button>
-                </div>
+                ) : (
+                  <p className="text-center">Loading songs...</p>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      
     </>
   );
 };

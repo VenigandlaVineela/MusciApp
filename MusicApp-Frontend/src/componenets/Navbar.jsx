@@ -4,9 +4,6 @@ import { MdAccountCircle, MdOutlineAccountCircle, MdOutlineMailOutline } from "r
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
-import logo1 from '../assets/logo1.png';
-import playIcon from '../assets/playIcon.png';
-import pauseIcon from '../assets/pauseIcon.png';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { CgPlayButtonO } from "react-icons/cg";
 import { GiPauseButton } from "react-icons/gi";
@@ -40,7 +37,7 @@ const Navbar = () => {
      const [isPlaying, setIsPlaying] = useState(false);
      const audioRef = useRef(null);
 
-     // ✅ Fetch songs from API
+     // Fetch songs from API
      useEffect(() => {
           const fetchSongs = async () => {
                try {
@@ -54,7 +51,7 @@ const Navbar = () => {
           fetchSongs();
      }, []);
 
-     // ✅ Play/Pause handler
+     //  Play/Pause handler
      const togglePlayPause = () => {
           if (!audioRef.current) return;
           if (isPlaying) {
@@ -83,7 +80,6 @@ const Navbar = () => {
      };
 
      const handleContact = async (e) => {
-
 
           try {
                const response = await fetch(
@@ -186,9 +182,9 @@ const Navbar = () => {
 
      // Login User
 
+
      const handleLogin = async () => {
           try {
-
                const response = await fetch("http://127.0.0.1:8080/musicApp/login/validateLogin", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -199,6 +195,15 @@ const Navbar = () => {
 
                if (result.includes("Login successful")) {
                     sessionStorage.setItem('loggedInUser', JSON.stringify(loginData));
+                    
+                    // Close the modal before navigating
+                    const modalEl = document.getElementById("signUpModal");
+                    const modal = window.bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                    
+                    // Reset login form
+                    setLoginData({ email: '', password: '' });
+                    
                     navigate('/dashboard');
                } else {
                     alert(result);
@@ -209,6 +214,36 @@ const Navbar = () => {
           }
      };
 
+     // const handleLogin = async () => {
+     //      try {
+
+     //           const response = await fetch("http://127.0.0.1:8080/musicApp/login/validateLogin", {
+     //                method: 'POST',
+     //                headers: { 'Content-Type': 'application/json' },
+     //                body: JSON.stringify(loginData)
+     //           });
+
+     //           const result = await response.text();
+
+     //           if (result.includes("Login successful")) {
+     //                sessionStorage.setItem('loggedInUser', JSON.stringify(loginData));
+     //                const modalEl = loginModalRef.current;
+     //                if (modalEl) {
+     //                     let modalInstance = bootstrap.Modal.getInstance(modalEl);
+     //                     if (!modalInstance) {
+     //                          modalInstance = new bootstrap.Modal(modalEl);
+     //                     }
+     //                     modalInstance.hide();
+     //                }
+     //                navigate('/dashboard');
+     //           } else {
+     //                alert(result);
+     //           }
+     //      } catch (error) {
+     //           console.log("Error during login:", error);
+     //           alert('Invalid username or password');
+     //      }
+     // };
 
 
      // const handleLogin = () => {
@@ -229,8 +264,6 @@ const Navbar = () => {
 
 
      // Music Functions
-
-
      return (
           <>
                {/* Sticky Navbar */}
@@ -243,11 +276,11 @@ const Navbar = () => {
                     //      zIndex: 1030,
                     // }}
                     style={{
-        background:
-          "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
-        color: "white",
-      }}>
-               
+                         background:
+                              "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
+                         color: "white",
+                    }}>
+
                     <div className="container">
                          <div className="row align-items-center py-2">
                               {/* Logo */}
@@ -277,13 +310,13 @@ const Navbar = () => {
                                                   <ul className="navbar-nav gap-2">
                                                        <li className="nav-item">
                                                             <button
-                                                                 className="btn px-1 py-2 fw-bold fs-5 text-white"
-                                                                 // style={{
-                                                                 //      backgroundImage:
-                                                                 //           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
-                                                                 //      WebkitBackgroundClip: 'text',
-                                                                 //      WebkitTextFillColor: 'transparent',
-                                                                 // }}
+                                                                 className="btn px-1 py-2 fw-bold fs-5 "
+                                                                 style={{
+                                                                      backgroundImage:
+                                                                           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
+                                                                      WebkitBackgroundClip: 'text',
+                                                                      WebkitTextFillColor: 'transparent',
+                                                                 }}
                                                                  onClick={() => navigate('/')}
                                                             >
                                                                  Home
@@ -291,13 +324,13 @@ const Navbar = () => {
                                                        </li>
                                                        <li className="nav-item">
                                                             <button
-                                                                 className="btn px-1 py-2 fw-bold fs-5 text-white"
-                                                                 // style={{
-                                                                 //      backgroundImage:
-                                                                 //           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
-                                                                 //      WebkitBackgroundClip: 'text',
-                                                                 //      WebkitTextFillColor: 'transparent',
-                                                                 // }}
+                                                                 className="btn px-1 py-2 fw-bold fs-5  "
+                                                                 style={{
+                                                                      backgroundImage:
+                                                                           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
+                                                                      WebkitBackgroundClip: 'text',
+                                                                      WebkitTextFillColor: 'transparent',
+                                                                 }}
                                                                  onClick={() => navigate('/musictypes')}
                                                             >
                                                                  Music Types
@@ -307,26 +340,26 @@ const Navbar = () => {
                                                             <button
                                                                  data-bs-toggle="modal"
                                                                  data-bs-target="#randomModal"
-                                                                 className="btn px-1 py-2 fw-bold fs-5 text-white"
-                                                                 // style={{
-                                                                 //      backgroundImage:
-                                                                 //           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
-                                                                 //      WebkitBackgroundClip: 'text',
-                                                                 //      WebkitTextFillColor: 'transparent',
-                                                                 // }}
+                                                                 className="btn px-1 py-2 fw-bold fs-5  "
+                                                                 style={{
+                                                                      backgroundImage:
+                                                                           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
+                                                                      WebkitBackgroundClip: 'text',
+                                                                      WebkitTextFillColor: 'transparent',
+                                                                 }}
                                                             >
                                                                  Random Play
                                                             </button>
                                                        </li>
                                                        <li className="nav-item">
                                                             <button
-                                                                 className="btn px-1 py-2 fw-bold fs-5 text-white"
-                                                                 // style={{
-                                                                 //      backgroundImage:
-                                                                 //           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
-                                                                 //      WebkitBackgroundClip: 'text',
-                                                                 //      WebkitTextFillColor: 'transparent',
-                                                                 // }}
+                                                                 className="btn px-1 py-2 fw-bold fs-5  "
+                                                                 style={{
+                                                                      backgroundImage:
+                                                                           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
+                                                                      WebkitBackgroundClip: 'text',
+                                                                      WebkitTextFillColor: 'transparent',
+                                                                 }}
                                                                  data-bs-toggle="modal"
                                                                  data-bs-target="#contactModal"
                                                             >
@@ -336,13 +369,13 @@ const Navbar = () => {
 
                                                        <li className="nav-item">
                                                             <button
-                                                                 className="btn px-1 py-2 fw-bold fs-5 text-white"
-                                                                 // style={{
-                                                                 //      backgroundImage:
-                                                                 //           'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #6e2daa)',
-                                                                 //      WebkitBackgroundClip: 'text',
-                                                                 //      WebkitTextFillColor: 'transparent',
-                                                                 // }}
+                                                                 className="btn px-1 py-2 fw-bold fs-5 "
+                                                                 style={{
+                                                                      backgroundImage:
+                                                                           'linear-gradient(150deg, rgba(156, 15, 104, 1), #3B82F6, #aa2d87ff)',
+                                                                      WebkitBackgroundClip: 'text',
+                                                                      WebkitTextFillColor: 'transparent',
+                                                                 }}
                                                                  data-bs-toggle="modal"
                                                                  data-bs-target="#signUpModal"
                                                             >
@@ -516,7 +549,13 @@ const Navbar = () => {
                                                   </div>
 
                                                   {/* ✅ Song Title + Singer */}
-                                                  <h5 className="text-center my-3 text-secondary">
+                                                  <h5 className="text-center my-3 "
+                                                       style={{
+                                                            backgroundImage: 'linear-gradient(135deg, #e62cdaff, #ad98eaff)',
+                                                            WebkitBackgroundClip: 'text',
+                                                            WebkitTextFillColor: 'transparent',
+                                                            fontWeight: 'bold',
+                                                       }}>
                                                        {/* style={{
                                                             backgroundImage:
                                                                  "linear-gradient(135deg, #e62cda, #6e2daa, #3B82F6)",
@@ -524,6 +563,7 @@ const Navbar = () => {
                                                             WebkitTextFillColor: "transparent",
                                                             fontWeight: "bold",
                                                        }} */}
+
                                                        {musicList[currentTrackIndex].singer}
 
                                                   </h5>
@@ -538,12 +578,13 @@ const Navbar = () => {
                                                   {/* ✅ Shuffle Button */}
                                                   <button
                                                        onClick={playRandomTrack}
-                                                       className="w-100 py-2 fw-bold btn rounded rounded-3" style={{
-                                                            backgroundImage: 'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #ea5e86ff)',
-                                                            WebkitBackgroundClip: 'text',
-                                                            WebkitTextFillColor: 'transparent',
-                                                            fontWeight: "bold",
-                                                       }}
+                                                       className="w-100 py-2 fw-bold btn rounded rounded-3 text-white"
+                                                  //  style={{
+                                                  //      backgroundImage: 'linear-gradient(135deg, rgb(146, 49, 110), #3B82F6, #ea5e86ff)',
+                                                  //      WebkitBackgroundClip: 'text',
+                                                  //      WebkitTextFillColor: 'transparent',
+                                                  //      fontWeight: "bold",
+                                                  // }}
                                                   >
                                                        Shuffle
                                                   </button>

@@ -50,6 +50,12 @@ const Categories = () => {
                 WebkitTextFillColor: 'transparent',
                 display: 'inline-block',
               }}
+            //   style={{
+            //   backgroundImage: 'linear-gradient(135deg, #e31cd5ff, #ad98eaff)',
+            //   WebkitBackgroundClip: 'text',
+            //   WebkitTextFillColor: 'transparent',
+            //   fontWeight: 'bold',
+            // }}
             >
               Popular Music
             </h1>
@@ -130,10 +136,10 @@ const Categories = () => {
             ))}
           </div>
         </div>
-        </div>
+      </div>
 
-      </>
-      );
+    </>
+  );
 };
 
-      export default Categories;
+export default Categories;
