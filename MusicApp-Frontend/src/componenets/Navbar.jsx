@@ -299,12 +299,13 @@ const Navbar = () => {
                                    <nav className="navbar navbar-expand-lg">
                                         <div className="container-fluid">
                                              <button
-                                                  className="navbar-toggler"
+                                                  className="navbar-toggler border border-white p-2"
                                                   type="button"
                                                   data-bs-toggle="collapse"
                                                   data-bs-target="#navbarNav"
                                              >
-                                                  <span className="navbar-toggler-icon"></span>
+                                                  <span className="navbar-toggler-icon "  
+                                                  ></span>
                                              </button>
                                              <div className="collapse navbar-collapse" id="navbarNav">
                                                   <ul className="navbar-nav gap-2">
